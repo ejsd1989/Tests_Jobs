@@ -1,0 +1,116 @@
+### CODING CHALLENGE ###
+# ----------------------------------------------------------------------
+# You will be provided with a folder containing several files with '.fastq' extension.
+# Your general task is to parse the files and output some useful statistics to a new file called 'summary.txt'.
+# ----------------------------------------------------------------------
+# Each input file name will have the following format:
+# 
+#   flowcell-project_subproject_method_id_code.fastq
+# 
+# Example: 'DV-S2_ACTTGA_L008_R1_001.fastq'
+# ----------------------------------------------------------------------
+# Sample file content:
+# 
+#   @HWI-D00351:132:C5DNLANXX:8:1101:1220:1983 2:N:0:GATCAG
+#   GACTTAAGAGTTTAATATGACTTAAACATTAAAAGCTCACACTACCCCGAAATATATAATTTCACGCATACGGTGAGATCGGAAGAGCGTCGTGTAGGGAAAGAGTGTAGATCTCGGTGGTCGCC
+#   +
+#   BBBBBFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+#   @HWI-D00351:132:C5DNLANXX:8:1101:1685:1968 2:N:0:GATCAG
+#   NCCGCTTGGAACTAGCTTTAGTAATATAATCGCGAATTTGAACAAGCCTGCTTACAATCTGGCTGCTCTCCATTGCAGGTTCTCCCCTCCCATCTTCTTCAGTCACCTGACAGTTTTGCAAGATC
+#   +
+#   #<<<BF//FBBFF<FFFFFFFFF<FFFFFFFFF/FFFFFFFFFFFBF<BFFFFFFFFFFFBF/BFBFFFFFFFFFFFFFFF<FFFFF<FBFFFFF<FFFFFFFFFFBFBFFFFFFFFFFFFFFFF
+# ----------------------------------------------------------------------
+# Each line on positions {2, 6, .. 4n + 2 ..} in the file will be a string of characters {'A', 'T', 'G', 'C', 'N'}.
+# ----------------------------------------------------------------------
+ 
+# TASKS:
+#
+# 1. Compute the occurrence frequency of the characters {'A', 'T', 'G', 'C'}.
+# 
+#   The 'summary.txt' file should contain the following format for each file:
+# 
+#   Example (for one file):
+#
+#       {
+#           'filename'      : 'DV-S2_ACTTGA_L008_R1_001.fastq',
+#           'flowcell'      : 'DV',
+#           'project'       : 'S2',
+#           'subproject'    : 'ACTTGA',
+#           'method'        : 'L008',
+#           'id'            : 'R1',
+#           'code'          : 1,
+#           'A_freq'        : 69,
+#           'T_freq'        : 70,
+#           'G_freq'        : 51,
+#           'C_freq'        : 59
+#       }
+# 2. Generalize your script to receive a directory path that contains multiple '.fastq' files as input, from #command line.
+ 
+
+# I thought it would be fun to attempt to put this solution together
+# in Python as it's a good learning experience. I normally code in
+# C#, C++, PHP, and Javascript, so please bear with my attempts at the code :P
+
+# *args - Files paths
+def ParseFiles(*args):
+    output = [0, 0, 0, 0]
+    for path in args:
+        data = OpenFile(path)
+        counts = FindCharInStr(data)
+        output[0] += counts[0]
+        output[1] += counts[1]
+        output[2] += counts[2]
+        output[3] += counts[3]
+		SummaryFormattedOutput(path, counts)
+    print output
+
+# psuedo for making the "summary.txt"
+def SummaryFormattedOutput(filename, counts):
+	#open a file
+	#split filename into appropriate tokenizations parameters
+	#print the tokenizations and the frequencies
+	#save & close the file
+	
+# open and extract file data into a string object
+def OpenFile(filename):
+    with open(filename, "r") as file:
+        text = file.read().replace('\n', '')
+    return text
+        
+# parse string and update counts (could use a dictionary, but quick implementation :D)
+def FindCharInStr(str_i):
+    A = T = G = C = 0
+    for char in str_i:
+        if char == 'A':
+           A += 1
+        if char == 'T':
+           T += 1
+        if char == 'G':
+           G += 1
+        if char == 'C':
+           C += 1   
+    return A, T, G, C
+
+A = 0
+T = 0
+G = 0
+C = 0
+
+ParseFiles("DV-S2_ACTTGA_L008_R1_001.fastq", "DV-S2_ACTTGA_L008_R1_002.fastq", "DV-S2_ACTTGA_L008_R1_003.fastq", "DV-S3_ACGTGA_L008_R2_001.fastq", "DV-S4_ACTTCA_L008_R1_002.fastq")
+ 
+# 3. Parallelize your code.
+ 
+	We could parellize our code by utilizing a custom multiprocessing scheme depending on what we know about
+	our data sets.
+	
+	The case I would think of using right now, based on the little data I know about the content we are analyzing, would utilize splitting by files that are being read in or based on actual filesizes. We could create the logic split up the text data over multiple processes (I read something about not using threads due to limitations of the GIL and the way it mutexes threads) then merge the counts
+ 
+# 4. Consider the following string S that consists entirely of characters 'A', 'T', 'G' and 'C'. Sort S efficiently.
+ 
+S = 'GACTTAAGAGTTTAATATGACTTAAACATTAAAAGCTCACACTACCCCGAAATATATAATTTCACGCATACGGTGAGATCGGAAGAGCGTCGTGTAGGGAAAGAGTGTAGATCTCGGTGGTCGCC'
+ 
+#based on documentation, it seems like python utilizes timesor
+def efficient_sort(s):
+	return ''.join(sorted(str1))
+ 
+S_sorted = efficient_sort(S)
